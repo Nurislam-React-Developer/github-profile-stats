@@ -1,0 +1,32 @@
+name: Update GitHub Stats
+
+on:
+  schedule:
+    - cron: "0 0 * * *"  # Запуск каждый день в 00:00 UTC
+  workflow_dispatch:
+
+jobs:
+  update-stats:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout репозиторий
+        uses: actions/checkout@v3
+
+      - name: Установить Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.9"
+
+      - name: Установить зависимости
+        run: pip install matplotlib requests PyGithub
+
+      - name: Запустить скрипт
+        run: python generate_stats.py
+
+      - name: Коммит изменений
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git add stats.png
+          git commit -m "Обновление статистики" || echo "Нет изменений"
+          git push
